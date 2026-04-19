@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Story Game</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+        .box {
+            max-width: 600px;
+            margin: auto;
+        }
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background: #00c3ff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0099cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>{{ data.text }}</h2>
+
+        {% if data.choices %}
+            {% for choice in data.choices %}
+                <a href="/game?scene={{ choice.next }}">
+                    <button>{{ choice.text }}</button>
+                </a>
+            {% endfor %}
+        {% else %}
+            <a href="/"><button>Restart</button></a>
+        {% endif %}
+    </div>
+</body>
+</html>
