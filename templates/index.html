@@ -1,46 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Story Game</title>
+    <title>Midnight Call</title>
+
     <style>
         body {
             font-family: Arial;
-            background: #111;
-            color: white;
+            background: black;
+            color: red;
             text-align: center;
             padding: 50px;
+            transition: 0.5s;
+            animation: pulse 3s infinite;
         }
+
+        @keyframes pulse {
+            0% {background-color: black;}
+            50% {background-color: #0a0000;}
+            100% {background-color: black;}
+        }
+
         .box {
             max-width: 600px;
             margin: auto;
         }
+
+        h1 {
+            animation: shake 0.3s infinite;
+        }
+
+        @keyframes shake {
+            0% {transform: translate(0,0);}
+            25% {transform: translate(2px,2px);}
+            50% {transform: translate(-2px,2px);}
+            75% {transform: translate(2px,-2px);}
+            100% {transform: translate(0,0);}
+        }
+
         button {
             display: block;
-            margin: 10px auto;
-            padding: 10px 20px;
-            background: #00c3ff;
-            border: none;
-            cursor: pointer;
+            margin: 15px auto;
+            padding: 14px 30px;
+            background: linear-gradient(45deg, darkred, black);
+            border: 1px solid red;
+            color: white;
             font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
         }
+
         button:hover {
-            background: #0099cc;
+            transform: scale(1.1);
+            background: red;
         }
     </style>
 </head>
-<body>
-    <div class="box">
-        <h2>{{ data.text }}</h2>
 
-        {% if data.choices %}
-            {% for choice in data.choices %}
-                <a href="/game?scene={{ choice.next }}">
-                    <button>{{ choice.text }}</button>
-                </a>
-            {% endfor %}
-        {% else %}
-            <a href="/"><button>Restart</button></a>
-        {% endif %}
-    </div>
+<body>
+
+<div class="box">
+    <h1>📞 MIDNIGHT CALL</h1>
+
+    <h2 id="storyText"></h2>
+
+    {% if data.choices %}
+        {% for choice in data.choices %}
+            <a href="/game?scene={{ choice.next }}" onclick="playSound()">
+                <button>{{ choice.text }}</button>
+            </a>
+        {% endfor %}
+    {% else %}
+        <a href="/" onclick="playSound()">
+            <button>Restart</button>
+        </a>
+    {% endif %}
+</div>
+
+<!-- ✅ WORKING AUDIO SOURCE -->
+<audio id="sound" preload="auto">
+    <source src="https://cdn.pixabay.com/audio/2023/03/15/audio_2c7a1d0b5c.mp3" type="audio/mp3">
+</audio>
+
+<script>
+const text = "{{ data.text }}";
+let i = 0;
+
+function typeWriter() {
+    if (i < text.length) {
+        document.getElementById("storyText").innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 40);
+    }
+}
+
+typeWriter();
+
+function playSound() {
+    const sound = document.getElementById("sound");
+    sound.volume = 0.6;
+    sound.currentTime = 0;
+
+    sound.play().catch(function(err) {
+        console.log("Audio blocked or not allowed:", err);
+    });
+}
+</script>
+
 </body>
 </html>
+

@@ -1,40 +1,50 @@
+import random
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Story structure
 story = {
     "start": {
-        "text": "You wake up in a dark forest. You hear strange sounds...",
+        "text": "You wake up at 3:00AM. Your phone lights up... UNKNOWN NUMBER is calling.",
         "choices": [
-            {"text": "Follow the light", "next": "light_path"},
-            {"text": "Hide behind a tree", "next": "hide_path"}
+            {"text": "Answer the call", "next": "call"},
+            {"text": "Ignore it", "next": "ignore"}
         ]
     },
-    "light_path": {
-        "text": "You follow the light and find a mysterious stranger.",
+
+    "call": {
+        "text": "A whisper says: 'I can see you.' Your lights flicker.",
         "choices": [
-            {"text": "Talk to him", "next": "talk"},
-            {"text": "Run away", "next": "run"}
+            {"text": "Check the window", "next": "window"},
+            {"text": "Hide under the bed", "next": "bed"}
         ]
     },
-    "hide_path": {
-        "text": "You hide. Something passes by... it's gone now.",
+
+    "ignore": {
+        "text": "Your phone rings again. Louder. Closer.",
         "choices": [
-            {"text": "Keep hiding", "next": "end_hide"},
-            {"text": "Come out", "next": "light_path"}
+            {"text": "Turn off phone", "next": "off"},
+            {"text": "Run outside", "next": "outside"}
         ]
     },
-    "talk": {
-        "text": "He gives you treasure. You win! 🎉",
+
+    "window": {
+        "text": "You see yourself... standing outside.",
         "choices": []
     },
-    "run": {
-        "text": "You fall into a trap. Game over 😢",
+
+    "bed": {
+        "text": "Something grabs your leg.",
         "choices": []
     },
-    "end_hide": {
-        "text": "You stayed hidden forever... Game over.",
+
+    "off": {
+        "text": "Silence... then breathing behind you.",
+        "choices": []
+    },
+
+    "outside": {
+        "text": "You escaped... or did you?",
         "choices": []
     }
 }
@@ -46,8 +56,20 @@ def index():
 @app.route('/game')
 def game():
     scene = request.args.get('scene', 'start')
-    data = story.get(scene)
-    return render_template('index.html', data=data, scene=scene)
 
+    # Ending logic with randomness (AI feel)
+    if scene in ["window", "bed", "off", "outside"]:
+        endings = [
+            "You survived... barely.",
+            "Game Over. Something followed you.",
+            "You wake up again. It never ends.",
+            "You escaped. But at what cost?"
+        ]
+        text = story[scene]["text"] + " " + random.choice(endings)
+        return render_template("index.html", data={"text": text, "choices": []})
+
+    return render_template("index.html", data=story[scene])
+
+# ✅ IMPORTANT: This starts your Flask server
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=81)
+    app.run(debug=True, host='0.0.0.0', port=5000)
