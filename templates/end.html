@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Over</title>
+</head>
+<body style="background:black; color:red; text-align:center; padding:50px;">
+
+<h1>�� GAME OVER</h1>
+<h2>{{ text }}</h2>
+
+<h3>Your Score: {{ score }}</h3>
+
+<h2>🏆 Leaderboard</h2>
+<ul>
+    {% for player in leaderboard %}
+        <li>{{ player.name }} - {{ player.score }}</li>
+    {% endfor %}
+</ul>
+
+<a href="/"><button>Play Again</button></a>
+
+</body>
+</html>

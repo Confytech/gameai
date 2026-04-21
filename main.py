@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
+leaderboard = []
+
 story = {
     "start": {
         "text": "You wake up at 3:00AM. Your phone lights up... UNKNOWN NUMBER is calling.",
@@ -28,36 +30,26 @@ story = {
         ]
     },
 
-    "window": {
-        "text": "You see yourself... standing outside.",
-        "choices": []
-    },
-
-    "bed": {
-        "text": "Something grabs your leg.",
-        "choices": []
-    },
-
-    "off": {
-        "text": "Silence... then breathing behind you.",
-        "choices": []
-    },
-
-    "outside": {
-        "text": "You escaped... or did you?",
-        "choices": []
-    }
+    "window": {"text": "You see yourself... standing outside.", "choices": []},
+    "bed": {"text": "Something grabs your leg.", "choices": []},
+    "off": {"text": "Silence... then breathing behind you.", "choices": []},
+    "outside": {"text": "You escaped... or did you?", "choices": []}
 }
 
 @app.route('/')
 def index():
-    return redirect(url_for('game', scene='start'))
+    return render_template("start.html")
+
+@app.route('/start', methods=['POST'])
+def start():
+    name = request.form.get("name")
+    return redirect(url_for('game', scene='start', name=name))
 
 @app.route('/game')
 def game():
     scene = request.args.get('scene', 'start')
+    name = request.args.get('name', 'Player')
 
-    # Ending logic with randomness (AI feel)
     if scene in ["window", "bed", "off", "outside"]:
         endings = [
             "You survived... barely.",
@@ -65,11 +57,16 @@ def game():
             "You wake up again. It never ends.",
             "You escaped. But at what cost?"
         ]
+
+        score = random.randint(0, 100)
+        leaderboard.append({"name": name, "score": score})
+        leaderboard.sort(key=lambda x: x["score"], reverse=True)
+
         text = story[scene]["text"] + " " + random.choice(endings)
-        return render_template("index.html", data={"text": text, "choices": []})
 
-    return render_template("index.html", data=story[scene])
+        return render_template("end.html", text=text, score=score, leaderboard=leaderboard[:5])
 
-# ✅ IMPORTANT: This starts your Flask server
+    return render_template("index.html", data=story[scene], name=name)
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
